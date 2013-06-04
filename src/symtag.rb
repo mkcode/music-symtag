@@ -35,14 +35,14 @@ class SymTag
         end
       end
     rescue
-      puts "Could not tags from #{file}. File is probably bad."
+      puts "Could not read tags from #{file}. File is probably bad."
     end
     info    
   end
 
   def make_symlink(file, output_dir)
     info = get_info(file)
-    return puts "Bad info for #{file}" if info.empty? or info.artist.empty? or info.title.empty?
+    return puts "Bad info for #{file}" if info.nil? or info.empty? or info.artist.empty? or info.title.empty?
     path = File.join(output_dir, info.artist)
     path = File.join(path, info.album) unless info.album.empty?
     ensure_directories(path)
