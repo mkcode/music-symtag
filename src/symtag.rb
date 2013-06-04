@@ -43,7 +43,7 @@ class SymTag
   def make_symlink(file, output_dir)
     info = get_info(file)
     return puts "No info" unless info.is_a?(Hash)
-    return puts "Bad info for #{file}" if info.empty? or info.artist.empty? or info.title.empty?
+    return puts "Not enough info for #{file}" unless info.has_key?('artist') and info.has_key?('title')
     path = File.join(output_dir, info.artist)
     path = File.join(path, info.album) unless info.album.empty?
     ensure_directories(path)
