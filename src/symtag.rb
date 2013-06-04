@@ -46,7 +46,11 @@ class SymTag
     new_name = "#{info.tracknum} - #{new_name}" if info.tracknum
     new_name = "#{info.discnumber}.#{new_name}" if info.discnumber
     full_path = File.join(path, new_name)
-    FileUtils.ln_s(file, full_path, :force => true)
+    begin
+      FileUtils.ln_s(file, full_path, :force => true)
+    rescue
+      puts "Could not link #{new_name}"
+    end
   end
 
   def ensure_directories(path)
