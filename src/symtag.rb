@@ -22,16 +22,20 @@ class SymTag
 
   def get_info(file)
     info = {}
-    AudioInfo.open(file) do |i|
-      info = i.to_h
-      info['ext'] = i.extension
-    end
-    if info.ext == 'flac'
-      f = FlacInfo.new(file)
-      f.tags.each_pair do |k, v|
-        key = k.downcase
-        info[key] = v unless info.has_key?(key)
+    begin
+      AudioInfo.open(file) do |i|
+        info = i.to_h
+        info['ext'] = i.extension
       end
+      if info.ext == 'flac'
+        f = FlacInfo.new(file)
+        f.tags.each_pair do |k, v|
+          key = k.downcase
+          info[key] = v unless info.has_key?(key)
+        end
+      end
+    rescue
+      puts "Could not tags from #{file}. File is probably bad."
     end
     info    
   end
@@ -54,6 +58,10 @@ class SymTag
   end
 
   def ensure_directories(path)
-    File.exists?(path) || FileUtils.mkdir_p(path)
+    begin
+      File.exists?(path) || FileUtils.mkdir_p(path)
+    rescue
+      puts "Could not make path #{path}"
+    end
   end
 end
