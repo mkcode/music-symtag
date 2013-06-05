@@ -36,7 +36,7 @@ class SymTag
           info[key] = v unless info.has_key?(key)
         end
       end
-      # info.each_pair{|k, v| info[k] = sanitize_string(v)}
+      info.each_pair{|k, v| info[k] = sanitize_string(v)}
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
     ensure
