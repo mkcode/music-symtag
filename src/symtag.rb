@@ -57,8 +57,8 @@ class SymTag
 
   def make_symlink(file, output_dir)
     info = get_info(file)
-    puts info.inspect
-    return puts "Bad info for #{file}" unless info['artist'] and info['title']
+    # puts info.inspect
+    return puts "Bad info for #{file}" unless (info['artist'] and info['artist'] != '') and (info['title'] and info['title'] != '')
     path = File.join(output_dir, info.artist)
     path = File.join(path, info['album']) if info['album'] and info['album'] != ''
     ensure_directories(path)
