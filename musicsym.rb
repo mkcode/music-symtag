@@ -14,7 +14,7 @@ class CLIApp < Thor
   end
 
   desc "clean", "delete ouput directory"
-  def clean
+  def clean(unused_arg = true)
     output_dir = File.expand_path(options[:output])
     system('rm', '-rf', output_dir)
     puts "Deleted #{output_dir}"

@@ -2,11 +2,13 @@
 
 require 'audioinfo'
 require 'fileutils'
+require 'active_support'
+require 'pathname'
 
 class SymTag
   
   def initialize(source_directory, *options)
-    @source_directory = File.expand_path(source_directory)
+    @source_directory = Pathname.new(File.expand_path(source_directory))
   end
 
   def get_all_music_files()
@@ -34,7 +36,7 @@ class SymTag
           info[key] = v unless info.has_key?(key)
         end
       end
-      info.each_pair{|k, v| info[k] = sanitize_string(v)}
+      # info.each_pair{|k, v| info[k] = sanitize_string(v)}
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
     ensure
@@ -43,11 +45,12 @@ class SymTag
   end
 
   def sanitize_string(string)
-    string.gsub(/\0/, '')
+    string.gsub(/\0/, '').titleize.truncate(30)
   end
 
   def make_symlink(file, output_dir)
     info = get_info(file)
+    # puts info.inspect
     return puts "Bad info for #{file}" unless info['artist'] and info['title']
     path = File.join(output_dir, info.artist)
     path = File.join(path, info['album']) if info['album'] and info['album'] != ''
@@ -55,9 +58,12 @@ class SymTag
     new_name = "#{info['title']}.#{info['ext']}"
     new_name = "#{info['tracknum']} - #{new_name}" if info['tracknum'] and info['tracknum'] != ''
     new_name = "#{info['discnumber']}.#{new_name}" if info['discnumber'] and info['discnumber'] != ''
-    full_path = File.join(path, new_name)
+    full_path = Pathname.new(File.join(path, new_name))
+    path = Pathname.new(path)
+    relative_path = Pathname.new(file).relative_path_from(Pathname.new(path)) 
     begin
-      FileUtils.ln_s(file, full_path, :force => true)
+      FileUtils.cd path
+      FileUtils.ln_s(relative_path, new_name, :force => true)
     rescue
       puts "Could not link #{new_name}"
     end
