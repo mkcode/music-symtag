@@ -31,7 +31,7 @@ class SymTag
         f = FlacInfo.new(file)
         f.tags.each_pair do |k, v|
           key = k.downcase
-          info[key] = v unless info.has_key?(key)
+          info[key] = sanitize_string(v) unless info.has_key?(key)
         end
       end
     rescue
@@ -39,6 +39,10 @@ class SymTag
     ensure
       return info
     end
+  end
+
+  def sanitize_string(string)
+    string.gsub(/\0/, '')
   end
 
   def make_symlink(file, output_dir)
