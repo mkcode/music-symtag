@@ -43,7 +43,7 @@ class SymTag
 
   def make_symlink(file, output_dir)
     info = get_info(file)
-    unless info.is_a?(Hash) and info.has_key?('artist') and info.has_key?('title')
+    unless (info.is_a?(Hash) or info['artist'] or info['title'])
       puts "Bad info for #{file}"
       return false
     end
