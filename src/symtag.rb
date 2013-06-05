@@ -36,7 +36,14 @@ class SymTag
           info[key] = v unless info.has_key?(key)
         end
       end
-      info.each_pair{|k, v| info[k] = sanitize_tag_value(v)}
+      sane_info = {}
+      info.each_pair{|k, v| sane_info[k.downcase] = sanitize_tag_value(v)}
+      info = sane_info
+      if info['album artist'] and info['album_artist'].match(/.*various artists.*/i)
+        puts "==========VARIOUS ARTISTS============="
+        info['compilation'] = 'yes'
+        info['artist'] = "Various Artists"
+      end
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
     ensure
@@ -45,7 +52,7 @@ class SymTag
   end
 
   def sanitize_tag_value(tag)
-    tag.to_s.titleize.truncate(50).gsub(/\0/, '').gsub(/\u0000/, '')
+    tag.to_s.chomp.truncate(50).gsub(/the/, 'The').gsub(/\//, '\/').gsub(/\0/, '').gsub(/\u0000/, '')
   end
 
   def make_symlink(file, output_dir)
