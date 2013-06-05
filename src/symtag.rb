@@ -2,7 +2,7 @@
 
 require 'audioinfo'
 require 'fileutils'
-require 'active_support'
+require 'active_support/core_ext'
 require 'pathname'
 
 class SymTag
@@ -36,7 +36,7 @@ class SymTag
           info[key] = v unless info.has_key?(key)
         end
       end
-      info.each_pair{|k, v| info[k] = sanitize_string(v)}
+      info.each_pair{|k, v| info[k] = sanitize_tag_value(v)}
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
     ensure
@@ -44,8 +44,8 @@ class SymTag
     end
   end
 
-  def sanitize_string(string)
-    string.gsub(/\0/, '').titleize.truncate(30)
+  def sanitize_tag_value(tag)
+    tag.to_s.titleize.truncate(50).gsub(/\0/, '').gsub(/\u0000/, '')
   end
 
   def make_symlink(file, output_dir)
