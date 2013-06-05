@@ -36,8 +36,9 @@ class SymTag
       end
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
+    ensure
+      return info
     end
-    info    
   end
 
   def make_symlink(file, output_dir)
