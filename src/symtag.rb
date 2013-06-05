@@ -31,9 +31,10 @@ class SymTag
         f = FlacInfo.new(file)
         f.tags.each_pair do |k, v|
           key = k.downcase
-          info[key] = sanitize_string(v) unless info.has_key?(key)
+          info[key] = v unless info.has_key?(key)
         end
       end
+      info.each_pair{|k, v| info[k] = sanitize_string(v)}
     rescue
       puts "Could not read tags from #{file}. File is probably bad."
     ensure
