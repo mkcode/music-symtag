@@ -45,11 +45,11 @@ class SymTag
     info = get_info(file)
     return puts "Bad info for #{file}" unless info['artist'] and info['title']
     path = File.join(output_dir, info.artist)
-    path = File.join(path, info.album) unless info.album.empty?
+    path = File.join(path, info.album) if info.album and not info.album.blank?
     ensure_directories(path)
     new_name = "#{info.title}.#{info.ext}"
-    new_name = "#{info.tracknum} - #{new_name}" if info.tracknum
-    new_name = "#{info.discnumber}.#{new_name}" if info.discnumber
+    new_name = "#{info.tracknum} - #{new_name}" if info.tracknum and not info.tracknum.blank?
+    new_name = "#{info.discnumber}.#{new_name}" if info.discnumber and not info.discnumber.blank?
     full_path = File.join(path, new_name)
     begin
       FileUtils.ln_s(file, full_path, :force => true)
