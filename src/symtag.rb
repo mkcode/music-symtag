@@ -4,11 +4,13 @@ require 'audioinfo'
 require 'fileutils'
 require 'active_support/core_ext'
 require 'pathname'
+require 'logger'
 
 class SymTag
   
   def initialize(source_directory, *options)
     @source_directory = Pathname.new(File.expand_path(source_directory))
+    @logger = Logger.new(STDOUT)
   end
 
   def get_all_music_files()
@@ -40,12 +42,12 @@ class SymTag
       info.each_pair{|k, v| sane_info[k.downcase] = sanitize_tag_value(v)}
       info = sane_info
       if info['album artist'] and info['album artist'].match(/.*various artists.*/i)
-        # puts "==========VARIOUS ARTISTS============="
+        # Logger.info "==========VARIOUS ARTISTS============="
         info['compilation'] = 'yes'
         info['artist'] = "Various Artists"
       end
     rescue
-      puts "Could not read tags from #{file}. File is probably bad."
+      Logger.info "Could not read tags from #{file}. File is probably bad."
     ensure
       return info
     end
@@ -57,8 +59,8 @@ class SymTag
 
   def make_symlink(file, output_dir)
     info = get_info(file)
-    # puts info.inspect
-    return puts "Bad info for #{file}" unless (info['artist'] and info['artist'] != '') and (info['title'] and info['title'] != '')
+    # Logger.info info.inspect
+    return Logger.info "Bad info for #{file}" unless (info['artist'] and info['artist'] != '') and (info['title'] and info['title'] != '')
     path = File.join(output_dir, info.artist)
     path = File.join(path, info['album']) if info['album'] and info['album'] != ''
     ensure_directories(path)
@@ -71,16 +73,26 @@ class SymTag
     begin
       FileUtils.cd path
       FileUtils.ln_s(relative_path, new_name, :force => true)
+      # make_image_symlinks_for_directory(file, path)
     rescue
-      puts "Could not link #{new_name}"
+      Logger.info "Could not link #{new_name}"
     end
+  end
+
+  def make_image_symlinks_for_directory(old, new)
+    image_file_extensions = %w(.jpg .jpeg .png)
+    old_dir = File.dirname(old)
+    all_files = Dir.glob(File.join(old_dir, '**', '*'))
+    image_files = all_files.select{|f| image_file_extensions.any?{|ife| ife == File.extname(f)}}
+    
+    
   end
 
   def ensure_directories(path)
     begin
       File.exists?(path) || FileUtils.mkdir_p(path)
     rescue
-      puts "Could not make path #{path}"
+      Logger.info "Could not make path #{path}"
     end
   end
 end
