@@ -20,6 +20,7 @@ class SymTag
   end
 
   def make_all_symlinks(output_dir)
+    @logger.info "Making symlinks in #{output_dir}"
     files = get_all_music_files()
     files.each{|f| make_symlink(f, output_dir)}
   end
@@ -42,12 +43,12 @@ class SymTag
       info.each_pair{|k, v| sane_info[k.downcase] = sanitize_tag_value(v)}
       info = sane_info
       if info['album artist'] and info['album artist'].match(/.*various artists.*/i)
-        # Logger.info "==========VARIOUS ARTISTS============="
+        # @logger.info "==========VARIOUS ARTISTS============="
         info['compilation'] = 'yes'
         info['artist'] = "Various Artists"
       end
     rescue
-      Logger.info "Could not read tags from #{file}. File is probably bad."
+      @logger.info "Could not read tags from #{file}. File is probably bad."
     ensure
       return info
     end
@@ -59,8 +60,8 @@ class SymTag
 
   def make_symlink(file, output_dir)
     info = get_info(file)
-    # Logger.info info.inspect
-    return Logger.info "Bad info for #{file}" unless (info['artist'] and info['artist'] != '') and (info['title'] and info['title'] != '')
+    # @logger.info info.inspect
+    return @logger.info "Bad info for #{file}" unless (info['artist'] and info['artist'] != '') and (info['title'] and info['title'] != '')
     path = File.join(output_dir, info.artist)
     path = File.join(path, info['album']) if info['album'] and info['album'] != ''
     ensure_directories(path)
@@ -75,7 +76,7 @@ class SymTag
       FileUtils.ln_s(relative_path, new_name, :force => true)
       # make_image_symlinks_for_directory(file, path)
     rescue
-      Logger.info "Could not link #{new_name}"
+      @logger.info "Could not link #{new_name}"
     end
   end
 
@@ -92,7 +93,7 @@ class SymTag
     begin
       File.exists?(path) || FileUtils.mkdir_p(path)
     rescue
-      Logger.info "Could not make path #{path}"
+      @logger.info "Could not make path #{path}"
     end
   end
 end

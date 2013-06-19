@@ -5,6 +5,8 @@ require_relative 'src/symtag'
 class CLIApp < Thor
   class_option :verbose, :type => :boolean, :aliases => :v
   class_option :output, :default => './Organized-Music', :aliases => :o, :desc => 'Directory where to put organized files'
+  # Let's just use STDOUT and redirects
+  # class_option :log, :default => 'STDOUT', :aliases => :l, :desc => 'Log file. Default is STDOUT'
   
   desc "make", "Do it now!"
   def make(source_directory)
